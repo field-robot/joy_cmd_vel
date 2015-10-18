@@ -1,0 +1,12 @@
+<launch>
+<param name="max_vel" type="double" value="2.0"/>
+		<param name="max_ang" type="double" value="1.0"/>
+	<node pkg="joy_cmd_vel" type="joy_cmd_vel" name="joy_cmd_vel" output="screen">
+		
+		<remap from="cmd_vel" to="r2d2_diff_drive_controller/cmd_vel"/>
+	</node>
+	
+	<node pkg="joy" type="joy_node" name="joy_node">
+		<param name="deadzone" type="double" value="0.15"/>
+	</node>
+</launch>
