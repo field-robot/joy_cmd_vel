@@ -19,6 +19,9 @@ int y_button;
 double x_velocity;
 double omega;
 
+double x_vel_prev = 0.0001;
+double omega_prev= 0.0001;
+
 void joy_stick (const sensor_msgs::Joy &stick)
 {
 	direction = stick.axes[0];
@@ -41,7 +44,7 @@ int main(int argc, char **argv)
 	double max_ang_;
 	nh.param("max_vel",max_vel_,1.0);
 	nh.param("max_ang",max_ang_,1.0);
-	ROS_INFO("Max vel = %d", max_vel_);
+
 
 	ros::Subscriber joystick = nh.subscribe("joy", 1, &joy_stick);	
 	ros::Publisher send_cmd_vel = nh.advertise<geometry_msgs::Twist>("cmd_vel",1);
@@ -62,11 +65,16 @@ int main(int argc, char **argv)
 		}
 		omega = direction*max_ang_;
 		
-	
+		if ((x_velocity!=x_vel_prev)|(omega != omega_prev))
+		{
 		geometry_msgs::Twist vel_;
 		vel_.angular.z = omega;
 		vel_.linear.x = x_velocity;
 		send_cmd_vel.publish(vel_);
+		omega_prev = omega;
+		x_vel_prev = x_velocity;
+		ROS_INFO("Sending");
+		}
 		ros::spinOnce();		
 		loop_rate.sleep();
 	}
