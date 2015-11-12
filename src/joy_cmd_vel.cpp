@@ -71,6 +71,8 @@ int main(int argc, char **argv)
 		if ((rt_button == 1)&(mode==0)){
 			 mode = 1;
 			ROS_INFO("Mode is 1");
+			system("rosrun wheels_controller wheels_controller &");
+			
 		}
 		if ((rb_button == 1)&(mode==0)){
 			mode = 2;
@@ -80,7 +82,11 @@ int main(int argc, char **argv)
 			 mode = 3;
 			ROS_INFO("Mode is 3");
 		}
-		if ((lb_button == 1)&(mode==1)) mode = 0;
+		if ((lb_button == 1)&(mode==1)){
+			system("rosnode kill wheels_controller");		    	
+			mode = 0;
+		 	
+		}
 		if ((lb_button == 1)&(mode==2)) mode = 0;
 		if ((lb_button == 1)&(mode==3)) mode = 0;
 		if (mode == 0)
