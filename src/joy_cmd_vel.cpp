@@ -4,6 +4,7 @@
 #include <std_msgs/Float64.h>
 #include <std_msgs/Int8.h>
 
+
 #define a_loc 0
 #define b_loc 1
 #define x_loc 2
@@ -54,11 +55,12 @@ int main(int argc, char **argv)
 	ros::init(argc, argv, "joy_cmd_vel");
 	//initializing package
 	ros::NodeHandle nh;
+	ros::NodeHandle paramHandle("~");
 	
 	double max_vel_;
 	double max_ang_;
-	nh.param("max_vel",max_vel_,1.0);
-	nh.param("max_ang",max_ang_,1.0);
+	paramHandle.param("max_vel",max_vel_,1.0);
+	paramHandle.param("max_ang",max_ang_,1.0);
 
 
 	ros::Subscriber joystick = nh.subscribe("joy", 1, &joy_stick);	
@@ -68,10 +70,12 @@ int main(int argc, char **argv)
 	ros::Rate loop_rate(10);
 	while(ros::ok())
 	{
+
 		if ((rt_button == 1)&(mode==0)){
 			 mode = 1;
 			ROS_INFO("Mode is 1");
-			system("rosrun wheels_controller wheels_controller &");
+			system("roslaunch field_robot_2dnav field_robot_configuration_gmapping.launch &");
+			system("roslaunch slam_navigation slam_nav.launch &");
 			
 		}
 		if ((rb_button == 1)&(mode==0)){
@@ -80,15 +84,29 @@ int main(int argc, char **argv)
 		}
 		if ((lt_button == 1)&(mode==0)){
 			 mode = 3;
-			ROS_INFO("Mode is 3");
+			 ROS_INFO("Mode is 3");
+			
 		}
+		
+
 		if ((lb_button == 1)&(mode==1)){
-			system("rosnode kill wheels_controller");		    	
+			
+			system("cd ~/catkin_ws/maps");
+			system("rosrun map_server map_saver &");
+			//system("echo $!");
+			//system("map_save=$!");
+			//system("sleep 3");
+			//system("kill $map_save");
+			system("rosnode kill move_base slam_gmapping sick_tim551_2050001 slam_navigation map_saver &");
+			ROS_INFO("Trying to kill all started nodes");
 			mode = 0;
-		 	
+					 	
 		}
 		if ((lb_button == 1)&(mode==2)) mode = 0;
-		if ((lb_button == 1)&(mode==3)) mode = 0;
+		if ((lb_button == 1)&(mode==3)){
+			 mode = 0;
+
+		}
 		if (mode == 0)
 		{
 			if (a_button == 1)
